@@ -155,78 +155,279 @@ matrix:(i,n,t)=>{const sd=seeds[i]||{a:0,b:0},sp=.5+Math.abs(sd.a)*.7,ph=Math.ab
   pal=['#003b00','#005500','#006600','#007a00','#009900','#00bb00','#33dd33','#88ff88','#ccffcc'],
   hot=(h%9)===0;
   if(tk('mx'+i,.8))em(i,pick('01'),0,R(70,150),{gr:0,max:1.3,s:.3,c:pick(pal.slice(2))});
-  return{y,r:0,c:hot?'#eaffe6':pal[h%7],a:hot?1:.55+((h>>>4)%40)/100,g:hot?16:5}}
+  return{y,r:0,c:hot?'#eaffe6':pal[h%7],a:hot?1:.55+((h>>>4)%40)/100,g:hot?16:5}},fog:(i,n,t)=>{if(tk('fg'+i,.5))em(i,'·',R(-10,10),R(-8,8),{dy:-fs*.2,gr:0,max:3,s:.5,c:'#889'});return{x:Math.sin(t*.4+i*.3)*fs*.4,a:.45}},
+heat:(i,n,t)=>{if(tk('ht',.07))em(Math.floor(R(0,n)),'~',R(-8,8),R(-90,-40),{dy:-fs*.2,gr:-40,max:1.2,s:.35,c:'#f84'});return{y:-(Math.sin(t*3+i*.5)+1)*fs*.04,r:Math.sin(t*4+i)*.02}},
+flow:(i,n,t)=>{const k=Math.sin(t*1.5-i*.4);return{x:((t*120+i*fs*.9)%(W-80))-(W-80)/2,y:k*fs*.15,r:k*.15}},
+smoke:(i,n,t)=>{if(tk('sm'+i,.25))em(i,pick('·o°'),R(-20,20),R(-50,-10),{dy:-fs*.5,gr:-25,max:2.4,s:.5+Math.random()*.5,c:'#777'});return{y:-Math.abs(Math.sin(t*.6+i))*fs*.06,a:.75,x:Math.sin(t*.8+i*.4)*fs*.12}},
+boil:(i,n,t)=>{if(tk('bl'+i,.12))em(i,pick('oO°'),R(-15,15),R(-140,-70),{dy:-fs*.1,gr:120,max:1,s:.4,c:'#ddf'});return{y:Math.sin(t*9+i)*3,x:Math.cos(t*8+i)*2,r:Math.sin(t*7+i)*.05}},
+crystal:(i,n,t)=>{const k=Math.min(1,(t%4)/1.2);if(tk('cr'+i,.5))em(i,'✦',R(-10,10),R(-20,10),{gr:0,max:.8,s:.4,c:'#cff'});return{sx:1+k*.05,sy:1+k*.05,c:'#dff',a:.65+.35*k}},
+rust:(i,n,t)=>{if(tk('ru'+i,.9))em(i,pick('·.'),R(-15,15),R(0,30),{land:1,gr:400,max:20,s:.3,c:'#a52'});return{y:Math.sin(t*3+i)*1,c:['#8a6','#a75','#7a4','#966'][i%4],a:.7}},
+electric:(i,n,t)=>{const c=Math.floor(t*6)%Math.max(1,n);if(tk('el',.06))em(c,pick('~-'),R(-30,30),R(-10,10),{gr:0,max:.15,s:.6,c:'#8ff'});return{x:i==c?Math.sin(t*90)*6:0,sx:i==c?1.15:1,c:i==c?'#aff':undefined}},
+land:(i,n,t)=>{const c=(t*.8+i*.15)%2.6,k=Math.min(1,c/1.1),e=k*k,sq=c>1.1&&c<1.35?(1-(c-1.1)/.25)*.3:0;
+  if(k>=1&&tk('ld'+i,2.6))em(i,'·',R(-25,25),R(-30,-5),{gr:400,max:.5,s:.3,c:'#bbb'});
+  return{y:-(1-e)*fs*2.5,sy:1-sq,sx:1+sq*.6}},
+chase:(i,n,t)=>{const s=Math.sin(t*3-i*.8);return{x:((t*150+i*14)%(W+ww+200))-W/2-ww/2-100,y:-Math.abs(s)*fs*.18,r:s*.12}},
+climb:(i,n,t)=>{const k=Math.min(1,((t*.5+i*.12)%3)/2);return{y:-k*fs*2,x:Math.sin(t*3+i)*fs*.15,r:Math.sin(t*8+i)*.15*(1-k)}},
+stagger:(i,n,t)=>{const s=Math.sin(t*3-i*.5);return{x:s*fs*.35,y:-Math.abs(s)*fs*.08,r:s*.2,sy:1-.05*Math.abs(s)}},
+wobble:(i,n,t)=>{const s=Math.sin(t*2+i*.3);return{r:s*.35,x:s*fs*.2,sx:1+s*.1,sy:1-s*.1}},
+zigzag:(i,n,t)=>{const p=(t*2+i*.12)%1,k=p<.5?p*2:2-p*2;return{x:(k-.5)*fs*1.5,y:-Math.abs(Math.sin(p*Math.PI*2))*fs*.2,r:(k-.5)*.6}},
+hang:(i,n,t)=>{const s=Math.sin(t*1.6+i*.4);return{y:fs*.25,r:s*.12,x:s*fs*.06}},
+twist:(i,n,t)=>{const s=Math.sin(t*2.2+i*.5);return{sx:Math.cos(s*1.2),r:s*.15}},
+balance:(i,n,t)=>{const s=Math.sin(t*1.8+i*.2);return{r:s*.25,y:-Math.abs(s)*fs*.05,x:Math.sin(t*2.5)*fs*.05}},
+limbo:(i,n,t)=>{const k=(Math.sin(t*1.4)+1)/2;return{r:.45*k,y:fs*.35*k,sx:1.05,sy:1-.15*k}},
+sit:(i,n,t)=>{const k=(Math.sin(t*.9)+1)/2*.4;return{y:fs*.35*k,r:.05*k,sy:1-.08*k}},
+stand:(i,n,t)=>{const k=.5+.5*Math.sin(t*1.1);return{y:-fs*.05*k,sy:1.02}},
+lie:(i,n,t)=>{const k=Math.min(1,((t*.5+i*.1)%3)/1.4),e=k*k*(3-2*k);return{y:e*fs*1.6,r:e*1.5}},
+hunt:(i,n,t)=>{const s=Math.sin(t*2+i*.5);if(i==n-1&&tk('hn',.8))em(i,'?',R(10,40),R(-50,-10),{gr:0,max:1.2,s:.5,c:'#fc9'});
+  return{x:s*fs*.3,y:Math.sin(t*3+i)*fs*.08,r:s*.1,sy:1-.04*Math.abs(s)}},
+cut:(i,n,t)=>{const c=(t*1.2+i*.1)%1.4,e=c<.15?c/.15:1;
+  if(c<.1&&tk('ct'+i,1.4))em(i,pick('/|'),R(-40,40),R(-60,-10),{gr:0,max:.4,s:.7,c:'#fff'});
+  return{sy:e<1?e:.85,sx:e<1?1:.9,r:e<1?0:(i%2?-.3:.3),y:e<1?0:fs*.2}},
+catch:(i,n,t)=>{const c=(t*1.5-i*.2)%1.6,e=Math.sin(Math.min(1,c/.8)*Math.PI);return{y:e*fs*.9,x:Math.sin(c*6)*fs*.15,r:e*.4,sy:1+e*.15}},
+fight:(i,n,t)=>{const s=Math.sin(t*10+i*1.2);if(tk('ft'+i,.5))em(i,pick('!*'),R(-120,120),R(-90,-20),{gr:200,max:.6,s:.5});
+  return{x:s*fs*.35,r:s*.3,sy:1-.05*Math.abs(s)}},
+dodge:(i,n,t)=>{const h=i%2?1:-1,c=(t*1.1+i*.15)%1.6,e=Math.sin(Math.min(1,c/.5)*Math.PI);return{x:h*e*fs*.9,y:e*fs*.3,r:h*e*.5}},
+juggle:(i,n,t)=>{const a=t*2.5+i*6.283/Math.max(1,n);return{x:Math.cos(a)*fs*.8,y:Math.sin(a)*fs*.44-fs*.5,r:a}},
+carry:(i,n,t)=>{const s=Math.sin(t*4-i*.5);return{y:-fs*.25-Math.abs(s)*3,r:.04,x:s*3}},
+lift:(i,n,t)=>{const k=Math.sin((t%2.5)/2.5*Math.PI);return{y:-k*fs*.6,r:Math.sin(t*8)*.03*k}},
+rescue:(i,n,t)=>{const k=Math.sin((t%3)/3*Math.PI);if(tk('rs'+i,.6))em(i,'✦',R(-20,20),R(-60,-20),{gr:-20,max:.9,s:.4,c:'#ffd'});
+  return{y:-k*fs*.5,r:Math.sin(t*4+i)*.06}},
+tickle:(i,n,t)=>{const h=Math.floor(t*12+i)%3-1;if(tk('tc'+i,.4))em(i,pick('~·'),R(-40,40),R(-40,0),{gr:-10,max:.5,s:.35,c:'#fda'});
+  return{x:h*fs*.12,y:Math.abs(h)*3,r:h*.12}},
+itch:(i,n,t)=>{const c=Math.floor(t*7+i)%4;if(tk('it'+i,.35))em(i,'.',R(-30,30),R(-30,0),{gr:100,max:.5,s:.3,c:'#fc9'});
+  return{x:(c-1.5)*fs*.1,r:Math.sin(t*30+i)*.03}},
+rub:(i,n,t)=>{const s=Math.sin(t*6);return{x:s*fs*.25,r:s*.08,y:-Math.abs(s)*2}},
+peel:(i,n,t)=>{const k=Math.min(1,((t*.7+i*.15)%3)/1.5);return{y:k*fs*1.2,x:(i%2?1:-1)*k*fs*.3,r:(i%2?1:-1)*k*.8,sy:1-.1*k}},
+carve:(i,n,t)=>{if(tk('cv'+i,.2))em(i,pick('·-'),R(-40,40),R(-20,20),{gr:400,land:1,max:20,s:.3,c:'#db9'});
+  return{x:Math.sin(t*6+i)*1.5,r:Math.sin(t*9+i)*.03}},
+polish:(i,n,t)=>{const s=Math.sin(t*4+i*.6);if(tk('pl',.15))em(Math.floor(R(0,n)),'✦',R(-20,20),R(-40,-10),{gr:0,max:.6,s:.4,c:'#fff'});
+  return{sx:1.03,sy:1.03,a:.8+.2*Math.abs(s)}},
+mix:(i,n,t)=>{const a=t*1.6;return{x:Math.sin(a+i*.9)*fs*.6,y:Math.cos(a*1.3+i*.7)*fs*.4,r:a+i}},
+chop:(i,n,t)=>{const c=(t*2.2+i*.05)%1,e=c<.12?1-c/.12:1;
+  if(c<.05&&tk('ch'+i,1))em(i,'|',0,-60,{gr:0,max:.25,s:.8,c:'#fff'});
+  return{sy:e*.9+.1,sx:1+(1-e)*.2}},
+suck:(i,n,t)=>{const k=(t*1.2+i*.1)%1.6/1.6;return{sx:1-k*.9,sy:1-k*.9,y:fs*.2*k,r:k*2}},
+refuse:(i,n,t)=>{const s=Math.sin(t*9);if(i==0&&tk('rf',.4))em(0,pick('xX'),R(-20,20),R(-60,-20),{gr:0,max:.7,s:.6,c:'#f88'});
+  return{x:s*8,r:s*.09,y:2}},
+smell:(i,n,t)=>{const c=Math.floor(t*5+i)%5;if(tk('sm2'+i,.4))em(i,'~',R(-15,15),R(-40,0),{gr:-15,max:1,s:.35,c:['#9c9','#c99','#99c','#cc9','#999'][c]});
+  return{x:Math.sin(t*2+i)*2}},
+copy:(i,n,t)=>{const k=Math.min(1,((t*.9+i*.12)%2.6)/1.2);
+  if(((t*.9+i*.12)%2.6)<.05&&tk('cp2'+i,2.6))em(i,chars[i]||'.',R(-30,30),R(-90,-40),{gr:-15,max:2,s:.7,c:'#9df'});
+  return{x:k*fs*.3,y:-k*fs*.45,sx:1+k*.15,a:1-k*.4}},
+scroll:(i,n,t)=>{const w=ww+fs*3,k=((t*160)%(w*1.5))-w*.75;return{x:k}},
+echo:(i,n,t)=>{if(tk('ec'+i,.35))em(i,chars[i]||'.',-140,0,{gr:0,max:.9,s:1,c:'#7cf'});return{x:Math.sin(t*8+i*.4)*2}},
+pixel:(i,n,t)=>{const h=Math.floor(t*8+i*3),on=h%5<2;if(on&&tk('px'+i,.1))em(i,pick('▪·'),R(-30,30),R(-30,30),{gr:0,max:.2,s:.4,c:'#0f0'});
+  return{x:on?Math.round(Math.sin(t*20+i)*3):0}},
+corrupt:(i,n,t)=>{const h=Math.floor(t*6),r=(Math.imul(h+i,2246822519)>>>0);
+  return{x:((r>>>3)%7-3)*fs*.06,y:((r>>>7)%7-3)*fs*.05,sx:(r>>>11)%2?1:-1,r:((r>>>13)%5-2)*.15,c:['#f66','#6f6','#66f','#ff6'][r%4]}},
+reboot:(i,n,t)=>{const c=(t*1.2+i*.05)%2.4,k=Math.min(1,c/.2);
+  if(c<.03&&tk('rb'+i,2.4))em(i,'·',R(-10,10),R(-20,20),{gr:0,max:.3,s:.4,c:'#6f9'});
+  return{sx:k,sy:k,a:k>.05?1:.2}},
+static:(i,n,t)=>{const h=Math.floor(t*12),r=(Math.imul(h*7+i,2654435761)>>>0);
+  if(tk('sa',.05))em(Math.floor(R(0,n)),'·',R(-20,20),R(-20,20),{gr:0,max:.12,s:.5,c:'#aaa'});
+  return{x:r%5-2,y:(r>>>3)%5-2,a:.5+((r>>>6)%50)/100}},
+blur:(i,n,t)=>{const s=Math.sin(t*1.2+i*.15);if(tk('bz',.1))em(Math.floor(R(0,n)),'·',R(-6,6),R(-6,6),{gr:0,max:.3,s:.6,c:'#556'});
+  return{x:s*fs*.12,a:.45,sx:1.02,sy:1.02}},
+load:(i,n,t)=>{const k=Math.min(1,((t*.8+i*.35)%3)/1.2);if(tk('lo'+i,.6))em(i,'·',0,60,{gr:0,max:.4,s:.3,c:'#6cf'});return{a:.25+.75*k}},
+scan:(i,n,t)=>{const c=Math.floor((t*3)%Math.max(1,n));return{sx:i==c?1.12:1,c:i==c?'#fff':undefined,a:i==c?1:.5}},
+fast:(i,n,t)=>{if(tk('fa',.08))em(Math.floor(R(0,n)),'-',R(-300,-150),0,{gr:0,max:.3,s:.4,c:'#def'});
+  return{x:((t*420)%(W+ww+200))-W/2-ww/2-100,r:.15}},
+slow:(i,n,t)=>{const s=Math.sin(t*1.2-i*.3);return{x:((t*30)%(W+ww+200))-W/2-ww/2-100,y:s*3,r:s*.05}},
+stop:(i,n,t)=>{const e=Math.min(1,(t%3)/1.2);return{x:e*fs*.8,r:e*.2,sy:e<1?1.02:1}},
+dim:(i,n,t)=>{const k=.5+.5*Math.sin(t*1.5+i*.2);return{a:.15+.35*k,sy:.98}},
+bright:(i,n,t)=>{const k=Math.pow(Math.abs(Math.sin(t*3)),4);
+  if(k>.6&&tk('br',.2))em(Math.floor(R(0,n)),'✦',R(-20,20),R(-40,0),{gr:0,max:.5,s:.6,c:'#ffe'});
+  return{a:.75+.25*k,g:6+12*k,c:k>.8?'#fff':undefined}},
+beep:(i,n,t)=>{const c=Math.floor(t*3)%Math.max(1,n);
+  if(i==c&&tk('bp',.35))em(i,'°',R(-10,10),R(-40,-10),{gr:-10,max:.6,s:.5,c:'#8f8'});
+  return{sx:i==c?1.06:1,sy:i==c?1.06:1,c:i==c?'#aff':undefined}},
+spark:(i,n,t)=>{if(tk('sp2'+i,.7))em(i,pick('*+'),R(-60,60),R(-80,-20),{gr:150,max:.5,s:.5,c:'#ffd'});
+  return{r:Math.sin(t*12+i)*.04}},
+build:(i,n,t)=>{const k=Math.min(1,((t*.6+i*.2)%3.4)/1.2);return{y:(1-k)*fs*2,r:(1-k)*.2}},
+tie:(i,n,t)=>{const k=(Math.sin(t*1.5)+1)/2;return{x:(i-(n-1)/2)*-fs*.12*k,sx:1-k*.15}},
+untie:(i,n,t)=>{const k=(Math.sin(t*1.5)+1)/2;return{x:(i-(n-1)/2)*fs*.25*k,r:k*.2*(i%2?1:-1)}},
+clean:(i,n,t)=>{const c=Math.floor(t*1.5)%Math.max(1,n+1);
+  if(i<c)return{a:.25};
+  if(tk('cl2',.3))em(i,'✦',R(-10,10),R(-30,0),{gr:0,max:.5,s:.4,c:'#cff'});
+  return{a:1}},
+dirty:(i,n,t)=>{if(tk('dt'+i,.4))em(i,pick('·.'),R(-15,15),R(0,20),{gr:200,land:1,max:20,s:.35,c:'#764'});
+  return{c:['#8a7','#7a6','#968'][i%3],a:.85}},
+weld:(i,n,t)=>{const c=Math.floor(t*14+i);
+  if(tk('wl'+i,.08))em(i,pick('*✦'),R(-40,40),R(-30,10),{gr:250,max:.4,s:.4,c:['#fff','#ffd','#fca'][c%3]});
+  return{x:Math.sin(t*20+i)*2,g:4}},
+paint:(i,n,t)=>{const cc=['#f66','#6f6','#66f','#fd6','#6df'][i%5];
+  if(tk('pa'+i,.4))em(i,'·',R(-20,20),R(10,60),{gr:400,land:1,max:20,s:.5,c:cc});
+  return{c:cc,a:.9,r:Math.sin(t*2+i)*.05}},
+drill:(i,n,t)=>{return{y:Math.sin(t*2+i*.4)*fs*.12,r:Math.sin(t*30+i)*.2,x:Math.cos(t*25+i)*2}},
+hammer:(i,n,t)=>{const c=(t*2.6-i*.12)%1,e=c<.2?c/.2:Math.max(0,1-(c-.2)/.5);
+  if(e>.95&&tk('hm'+i,1))em(i,pick('*!'),R(-60,60),R(-40,20),{gr:300,max:.5,s:.5,c:'#fdc'});
+  return{y:-e*fs*.35,r:-e*.25,sy:1-e*.06}},
+merge:(i,n,t)=>{const k=(Math.sin(t*1.4)+1)/2;return{x:((n-1)/2-i)*fs*.45*k,sx:1-k*.2}},
+multiply:(i,n,t)=>{const c=(t*.8+i*.1)%2.4,k=Math.sqrt(Math.min(1,c));
+  if(c<.05&&tk('ml'+i,2.4))em(i,chars[i]||'.',R(-40,40),R(-40,40),{gr:-10,max:1.6,s:.8,c:'#9f9'});
+  return{x:k*fs*.25,y:-k*fs*.25,sx:1+k*.5,sy:1+k*.5,a:1-k*.5}},
+flail:(i,n,t)=>{const s=Math.sin(t*7+i*.9),c=Math.cos(t*6+i);return{x:s*fs*.35,y:c*fs*.25,r:s*.5}},
+twitch:(i,n,t)=>{const r=(Math.imul(Math.floor(t*20)+i,2654435761)>>>0),on=r%6<2;
+  return{x:on?(r%3-1)*fs*.12:0,y:on?(r>>>3)%5-2:0,r:on*((r>>>5)%9)*.06}},
+wilt:(i,n,t)=>{const k=(Math.sin(t*.8)+1)/2;return{y:fs*.2*k,r:-.25*k,sy:1-.12*k,a:1-k*.15}},
+ring:(i,n,t)=>{const c=Math.floor(t*2)%Math.max(1,n);
+  if(i==c&&tk('rg',.5))em(i,'°',R(-10,10),R(-30,-10),{gr:-10,max:.7,s:.6,c:'#fd9'});
+  return{x:i==c?Math.sin(t*40)*2:0,sx:i==c?1.05:1}},
+bump:(i,n,t)=>{const e=Math.sin(Math.min(1,((t*2.4-i*.2)%1)/.3)*Math.PI);
+  if(e>.9&&tk('bp2'+i,1))em(i,'!',R(-20,20),R(-40,-10),{gr:0,max:.4,s:.4,c:'#fdd'});
+  return{x:e*fs*.4,r:e*.15}},
+erase:(i,n,t)=>{const p=((t*.7)%2.6)/2.6*n;return{a:i<p-.9?.001:(i<p?1-(p-i):1),sx:i<p-.9?.6:1,sy:i<p-.9?.6:1}},
+ghost:(i,n,t)=>{const k=(Math.sin(t*1.2+i*.2)+1)/2;
+  if(tk('gh'+i,.7))em(i,'·',R(-15,15),R(-40,-10),{gr:-10,max:1.4,s:.4,c:'#bdf'});
+  return{a:.15+.5*k,y:-Math.sin(t*.8+i*.3)*fs*.1,sy:1.02}}
 };
 const LEX={
 shit:'poop crap defecate dump excrete deuce turd',
 pee:'piss urinate wee tinkle squirt spray',
 jump:'hop leap bounce skip spring vault bound pounce bob hurdle pogo',
 dance:'boogie groove waltz tango salsa twerk shimmy jive swing party rave disco sway floss',
-run:'jog sprint dash race rush flee chase hurry gallop trot scurry bolt charge speed scamper dart zip',
+run:'jog sprint dash race rush flee chase hurry gallop trot scurry bolt charge speed scamper dart zip scramble escape',
 walk:'stroll amble wander march hike stride roam saunter trudge pace tiptoe stagger plod stomp tramp trek',
 sleep:'nap snooze snore doze rest slumber hibernate lounge relax idle',
 sneeze:'achoo cough wheeze sniff choke sniffle',
 vomit:'puke barf spew retch gag heave hurl throwup regurgitate upchuck',
 cry:'sob weep bawl wail whimper mourn grieve sulk blubber moan',
 laugh:'giggle chuckle cackle snicker guffaw chortle lol lmao joke tease mock smirk grin',
-eat:'nom munch chew gobble devour bite nibble swallow feast chomp gnaw lick slurp drink sip gulp dine snack taste',
+eat:'nom munch chew gobble devour bite nibble swallow feast chomp gnaw lick slurp drink sip gulp dine snack taste savor',
 fart:'toot burp belch gas stink poot flatulate honk',
 kick:'punt boot trample dribble tap',
-punch:'hit fight box slap smack whack bash strike slug hammer jab swat clobber beat spank bonk',
+punch:'hit fight box slap smack whack bash strike slug hammer jab swat clobber beat spank bonk wallop bop pound',
 sing:'hum whistle chant croon yodel rap serenade howl tweet chirp',
-spin:'twirl whirl rotate revolve swirl twist turn pirouette roll wind loop circle orbit',
-explode:'blow burst boom blast detonate bang pop erupt shatter smash destroy break crash wreck demolish',
-fly:'glide soar float hover levitate flap flutter swoop sail ascend launch',
-melt:'dissolve decay rot wither wilt sag deflate evaporate liquefy fade vanish disappear',
-shake:'tremble shiver vibrate shudder rattle jitter wiggle wobble quiver convulse twitch buzz tingle',
+spin:'twirl whirl rotate revolve swirl twist turn pirouette roll wind loop circle orbit gyrate pivot swivel',
+explode:'blow burst boom blast detonate bang pop erupt shatter smash destroy break crash wreck demolish implode rupture combust snap crack splinter fragment collide scatter disperse',
+fly:'glide soar float hover levitate flap flutter swoop sail ascend launch waft rise',
+melt:'dissolve decay rot wither wilt sag deflate evaporate liquefy fade vanish disappear thaw soften defrost shrivel mummify dehydrate crumble disintegrate',
+shake:'tremble shiver vibrate shudder rattle jitter wiggle wobble quiver convulse twitch buzz tingle judder jolt jar',
 wave:'hi hello greet salute bye goodbye ripple undulate flow',
 fall:'drop tumble collapse trip slip topple plunge plummet dive descend land',
-grow:'expand swell bloat enlarge balloon widen bulge sprout bloom',
+grow:'expand swell bloat enlarge balloon widen bulge sprout bloom blossom flower bud germinate ripen mature',
 freeze:'chill frost ice numb stiffen',
-burn:'cook bake fry boil grill roast simmer scorch ignite flame blaze toast sizzle sear smoke',
-love:'kiss hug cuddle adore like marry date flirt cherish snuggle smooch embrace',
+burn:'cook bake fry boil grill roast simmer scorch ignite flame blaze toast sizzle sear smoke kindle smolder singe char incinerate poach',
+love:'kiss hug cuddle adore like marry date flirt cherish snuggle smooch embrace caress',
 think:'ponder wonder guess doubt consider reflect imagine contemplate muse question ask',
-shout:'yell scream shriek roar bark yelp holler cheer bellow screech rage curse swear',
-talk:'speak chat say tell yap gossip babble chatter mumble mutter whisper lecture preach explain argue discuss narrate announce converse blab natter gab jabber utter recite',
+shout:'yell scream shriek roar bark yelp holler cheer bellow screech rage curse swear squawk',
+talk:'speak chat say tell yap gossip babble chatter mumble mutter whisper lecture preach explain argue discuss narrate announce converse blab natter gab jabber utter recite prattle ramble',
 rant:'rave vent complain whine gripe grumble nag bicker quarrel',
 point:'indicate gesture direct aim target show signal nudge prod',
 slap:'whip lash flog thwack',
-sway:'rock swing lean teeter totter oscillate waver sashay',
+sway:'rock swing lean teeter totter oscillate waver sashay pendulum',
 drift:'meander coast cruise linger loiter dawdle lurk',
-shift:'slide skate shuffle sidestep switch transfer relocate swap',
+shift:'slide skate shuffle sidestep switch transfer relocate swap ski',
 tumble:'somersault flip cartwheel wipeout flop',
-throw:'toss lob pitch fling chuck catapult',
+throw:'toss lob pitch fling chuck catapult yeet',
 crawl:'creep slither sneak inch slink squirm wriggle',
-push:'pull shove drag tug yank lift carry haul press',
+push:'pull shove drag tug yank lift carry haul press ram',
 clap:'applaud slam',
-bow:'nod bend curtsy kneel stoop duck apologize beg pray worship',
+bow:'nod bend curtsy kneel stoop duck apologize beg pray worship genuflect crouch plead agree',
 sparkle:'shine glow twinkle flash flicker glitter shimmer glimmer gleam blink wink beam radiate',
-pulse:'breathe throb inhale exhale thump',
-write:'type draw paint scribble sketch doodle sign text email code compose author spell print',
+pulse:'breathe throb inhale exhale thump pump',
+write:'type draw paint scribble sketch doodle sign text email code compose author spell print click',
 shoot:'fire zap snipe spit',
 buttsex:'sex fuck hump fornicate shag screw mate boink bone copulate procreate rut hookup',
 swim:'paddle splash row bathe wash soak',
 rain:'rain drizzle pour downpour sprinkle monsoon',
-snow:'snow blizzard sleet hail',
+snow:'snow blizzard sleet hail flurry',
 drip:'drip dribble trickle seep',
-storm:'storm thunder lightning tempest hurricane cyclone tornado typhoon gale',
+storm:'storm thunder lightning tempest hurricane cyclone tornado typhoon gale hailstorm deluge',
 wind:'wind blow breeze gust',
-flood:'flood drown submerge overflow surge',
+flood:'flood drown submerge overflow surge swamp inundate tsunami',
 quake:'quake earthquake rumble tremor',
-sink:'sink',
-zoom:'accelerate zoom',
-stretch:'stretch spread widen',
-squish:'squish squash squeeze crush compress flatten',
+sink:'sink lower',
+zoom:'accelerate zoom focus magnify',
+stretch:'stretch spread widen extend elongate flex',
+squish:'squish squash squeeze crush compress flatten pinch stamp',
 puff:'puff inflate',
-die:'die perish expire croak',
-dig:'dig excavate shovel burrow',
+die:'die perish expire croak decease',
+dig:'dig excavate shovel burrow tunnel mine drill',
 hide:'hide conceal cower',
 hiccup:'hiccup',
 dream:'dream',
 moonwalk:'moonwalk',
-teleport:'teleport warp',
-glitch:'glitch malfunction buffer lag',
-matrix:'matrix hack hacker codes'};;
+teleport:'teleport warp phase shift',
+glitch:'glitch malfunction buffer lag stutter',
+matrix:'matrix hack hacker codes cipher encrypt decrypt',
+fog:'fog mist haze smog vapor steam cloud billow',
+heat:'heat sweat swelter broil bask sunbathe scald perspire',
+smoke:'fume',
+flow:'stream cascade gush spurt spill slosh dump tip',
+boil:'bubble brew steep',
+crystal:'crystallize harden petrify solidify',
+rust:'rust corrode erode wear',
+electric:'shock spark electrify',
+land:'touchdown perch settle alight',
+chase:'follow pursue stalk track trail',
+stagger:'limp hobble lurch reel',
+climb:'climb scale clamber mount',
+wobble:'careen',
+zigzag:'zigzag',
+hang:'hang dangle suspend',
+twist:'wring wrench',
+balance:'balance',
+limbo:'limbo',
+sit:'sit',
+stand:'stand',
+lie:'lie sprawl slump',
+hunt:'hunt',
+cut:'cut slice chop slash stab pierce skewer dice mince saw',
+catch:'catch grab snatch clutch grip seize',
+fight:'brawl wrestle spar duel battle',
+dodge:'dodge weave evade swerve',
+juggle:'juggle',
+carry:'lug tote',
+lift:'raise hoist',
+rescue:'rescue save',
+tickle:'tickle poke',
+itch:'itch scratch scrape pick',
+rub:'massage knead rub',
+peel:'peel strip',
+carve:'carve chisel sculpt',
+polish:'buff sand smooth',
+mix:'mix stir blend fold',
+chop:'grate whisk',
+suck:'suck vacuum',
+refuse:'refuse deny disagree',
+smell:'smell reek whiff',
+copy:'copy paste duplicate clone replicate mirror',
+scroll:'scroll swipe',
+echo:'echo repeat',
+pixel:'pixelate',
+corrupt:'corrupt degrade',
+reboot:'reboot restart reset',
+static:'static hiss fuzz crackle',
+blur:'blur',
+load:'load download upload sync',
+scan:'scan search browse index',
+fast:'fast',
+slow:'slow',
+stop:'pause halt stall',
+dim:'dim dull',
+bright:'bright glare flare',
+beep:'beep ping blip',
+spark:'spark',
+build:'build stack assemble construct erect pile',
+tie:'tie knot bind wrap strap',
+untie:'untie untangle unknot unravel',
+clean:'clean scrub wipe polish scour',
+dirty:'dirty stain smudge smear splatter',
+weld:'weld bond',
+paint:'coat brush',
+drill:'bore',
+hammer:'nail',
+merge:'merge join unite fuse combine gather',
+multiply:'multiply spawn divide split',
+flail:'flail thrash writhe',
+twitch:'twitch jerk spasm',
+wilt:'droop',
+ring:'chime toll',
+bump:'bump knock',
+erase:'erase delete backspace undo clear',
+ghost:'ghost haunt materialize appear'
+};;
 const AL={};for(const k in LEX)LEX[k].split(' ').forEach(w=>AL[w]=k);
 function find(v){
   v=v.toLowerCase().replace(/[^a-z]/g,'');if(!v)return null;
