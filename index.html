@@ -9,16 +9,17 @@ canvas{position:fixed;inset:0}
 #ui{position:fixed;top:0;left:0;right:0;padding:16px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
 input,textarea{width:min(300px,44vw);min-width:140px;font:700 22px ui-monospace,Menlo,Consolas,monospace;color:#eee;background:#111;border:2px solid #333;border-radius:8px;padding:10px 14px;outline:none}
 input:focus,textarea:focus{border-color:#eee}
-input::placeholder,textarea::placeholder{color:#666;font-weight:400}textarea{resize:none;height:76px;line-height:1.2}#ui{pointer-events:none}input,textarea{pointer-events:auto}canvas{touch-action:none}
+input::placeholder,textarea::placeholder{color:#666;font-weight:400}textarea{resize:none;height:76px;line-height:1.2}#ui{pointer-events:none}input,textarea{pointer-events:auto}canvas{touch-action:none}#ctl{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;width:100%;font-size:13px;color:#888;align-items:center}#ctl input{min-width:0;font-size:15px;padding:6px 10px}#ctl input[type=range]{width:120px;padding:0;border:0;background:none;accent-color:#eee;vertical-align:middle}#ctl #sy{width:170px}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="ui">
 <textarea id="w" placeholder="word" maxlength="200" autocomplete="off" spellcheck="false">word</textarea>
 <input id="v" placeholder="verb" value="run" maxlength="30" autocomplete="off" spellcheck="false">
+<div id="ctl"><label>speed <input id="sp" type="range" min="0" max="3" step=".05" value="1"></label><label>symbols <input id="am" type="range" min="0" max="3" step=".05" value="1"></label><input id="sy" placeholder="your own symbols" maxlength="20" autocomplete="off" spellcheck="false"></div>
 </div>
 <script>
 const cv=document.getElementById('c'),cx=cv.getContext('2d'),wI=document.getElementById('w'),vI=document.getElementById('v');
-let W,H,DPR,fs,adv,gy,gnd,ww=0,BP=[],dd=[],drag=-1,chars=[],seeds=[],Lp=[],P=[],TS={},t=0,vf=null,vt='';
+let spd=1,amt=1,symG=null,W,H,DPR,fs,adv,gy,gnd,ww=0,BP=[],dd=[],drag=-1,chars=[],seeds=[],Lp=[],P=[],TS={},t=0,vf=null,vt='';
 const R=(a,b)=>a+Math.random()*(b-a),pick=s=>{const a=typeof s=='string'?Array.from(s):s;return a[Math.floor(Math.random()*a.length)]};
 const tk=(k,p)=>{if(t-(TS[k]??-9)>=p){TS[k]=t;return true}return false};
 const F=()=>`bold ${fs}px ${FF}`;
@@ -36,12 +37,13 @@ function lay(){
 addEventListener('resize',lay);
 
 /* spawn a particle from letter i (at its base; dy shifts it) */
-function em(i,g,vx,vy,o={}){
+function em0(i,g,vx,vy,o={}){
   const l=Lp[i]||{x:W/2,y:gy};
   P.push({x:l.x+(o.dx||0),y:l.y+(o.dy||0),vx,vy,gr:o.gr===undefined?700:o.gr,r:0,vr:R(-3,3),life:0,max:o.max||2,s:o.s||.4,c:o.c||'#bbb',land:!!o.land,g});
   if(P.length>600)P.shift();
 }
 
+const em=(i,g,vx,vy,o)=>{let c=Math.floor(amt)+(Math.random()<amt%1?1:0);while(c-->0)em0(i,symG?pick(symG):g,vx,vy,o)};
 /* each verb: (letterIndex, count, time) -> how that letter moves. x,y px; r radians; sx,sy scale about the baseline */
 const V={
 shit:(i,n,t)=>{const c=(t+i*.25)%3,st=c<1.8,k=st?c/1.8:0;
@@ -80,6 +82,23 @@ fly:(i,n,t)=>({x:Math.sin(t+i*.1)*fs,y:-fs*1.5+Math.sin(t*2+i*.5)*fs*.3,r:Math.s
 melt:(i,n,t)=>{const c=(t%4)/4,k=Math.min(1,c*1.4);if(tk('m'+i,.5))em(i,'.',R(-5,5),R(0,20),{land:1,max:30,s:.4});return{sy:1-.8*k,y:0,sx:1+.5*k}},
 shake:(i,n,t)=>({x:Math.sin(t*60+i*3)*5,y:Math.cos(t*55+i)*5,r:Math.sin(t*50+i)*.08}),
 wave:(i,n,t)=>({y:Math.sin(t*5-i*.7)*fs*.3,r:Math.cos(t*5-i*.7)*.25}),
+sway:(i,n,t)=>({x:Math.sin(t+i*.15)*fs*.5,r:Math.sin(t+i*.15)*.15}),
+drift:(i,n,t)=>({x:Math.sin(t*.5+i*.1)*fs*1.2,y:Math.sin(t*.7+i*.3)*fs*.15,r:Math.sin(t*.5+i*.1)*.08}),
+shift:(i,n,t)=>({x:Math.tanh(Math.sin(t*1.5+i*.2)*4)*fs*.7}),
+tumble:(i,n,t)=>{const k=Math.abs(Math.sin(t*2.5+i*.5));return{x:Math.sin(t*.8)*fs*2,y:-k*fs*.5,r:t*4*(i%2?1:-1)+i}},
+talk:(i,n,t)=>{const s=Math.abs(Math.sin(t*9+i*1.3));if(i==0&&tk('tk',.5))em(0,pick(['blah','...','yak','"']),R(60,140),R(-60,-20),{dy:-fs*.7,gr:-10,max:1.4,s:.45});return{y:-s*fs*.06,sy:1+s*.1}},
+rant:(i,n,t)=>{const s=Math.abs(Math.sin(t*16+i*1.7));if(tk('rn'+i,.3))em(i,pick(['!','?!','BLAH','#@%']),R(-100,100),R(-140,-50),{dy:-fs*.8,gr:200,max:1,s:.5});return{x:Math.sin(t*30+i)*3,y:-s*fs*.1,sy:1+s*.15,r:Math.sin(t*14+i)*.1}},
+point:(i,n,t)=>{const j=Math.max(0,Math.sin(t*4)),l=i==n-1;if(l&&j>.9&&tk('pt',.35))em(i,'→',220,0,{dy:-fs*.4,gr:0,max:.7,s:.6});return{r:.3,x:l?j*fs*.6:0,sx:l?1+j*.5:1}},
+slap:(i,n,t)=>{const c=(t*1.4-i*.12)%1,e=c<.15?c/.15:Math.max(0,1-(c-.15)/.3);if(e>.95&&tk('sl'+i,.6))em(i,pick(['SLAP','!','*']),R(60,160),R(-80,-20),{dy:-fs*.6,gr:200,max:.7,s:.5});return{r:-e,x:e*fs*.4}},
+throw:(i,n,t)=>{const c=(t*1.1-i*.1)%1.6,k=Math.sin(Math.min(1,c/1.2)*Math.PI);return{y:-k*fs*2.5,x:k*fs*.5,r:k*Math.PI*2*(i%2?1:-1)}},
+crawl:(i,n,t)=>{const s=Math.sin(t*4-i*.8);return{x:Math.sin(t*.7)*fs,sx:1+.3*s,sy:1-.2*s,y:fs*.05}},
+push:(i,n,t)=>{const s=Math.sin(t*3-i*.4);return{x:s*fs*.5,sx:1+Math.abs(s)*.3,r:s*.1}},
+clap:(i,n,t)=>{const p=Math.abs(Math.sin(t*6));if(i==0&&p>.97&&tk('cp',.3))em(0,'!',0,-80,{dy:-fs,gr:0,max:.5,s:.6});return{x:(i%2?-1:1)*p*fs*.25,sx:1-p*.2}},
+bow:(i,n,t)=>{const s=Math.max(0,Math.sin(t*2-i*.3));return{r:s*.9,y:s*fs*.1}},
+sparkle:(i,n,t)=>{const s=Math.max(0,Math.sin(t*5+i*1.9));if(s>.95&&tk('sp'+i,.4))em(i,pick('✦*+'),R(-20,20),R(-60,-20),{dy:-fs*.8,gr:-20,max:1,s:.6,c:'#ffd'});return{sx:1+s*.25,sy:1+s*.25}},
+pulse:(i,n,t)=>{const b=Math.pow(Math.max(0,Math.sin(t*4)),3);return{sx:1+b*.2,sy:1+b*.2}},
+write:(i,n,t)=>{const l=i==n-1;if(l&&tk('wr',.15))em(i,pick('_-~.,'),R(-20,20),R(20,60),{dy:-fs*.1,land:1,max:20,s:.4});return{x:l?Math.sin(t*20)*fs*.2:0,y:l?Math.sin(t*35)*fs*.1:0,r:l?-.3:0}},
+shoot:(i,n,t)=>{const c=(t*1.5)%1,l=i==n-1&&c<.1;if(l&&tk('sh',.2))em(i,pick('-·'),420,R(-10,10),{dy:-fs*.4,gr:0,max:.7,s:.5,c:'#ffe'});return{x:l?-fs*.3:0,r:l?-.3:0}},
 buttsex:(i,n,t)=>{const bt=t*(5+Math.min(t%8,6)*1.2),s=.5+.5*Math.sin(bt+Math.floor(i/2)*.6);
   if(i==0&&t%8>7&&tk('cl',.08))em(Math.floor(R(0,n)),pick('*♥!'),R(-150,150),R(-200,-60),{dy:-fs*.6,gr:300,max:1.2,s:.6,c:'#f6a'});
   if(i%2==0&&i+1>=n){if(tk('q'+i,.8))em(i,pick("'?"),R(-20,20),R(-60,-20),{dy:-fs*.9,gr:200,max:1,s:.4});return{r:Math.sin(t*20)*.1}}
@@ -124,15 +143,34 @@ burn:'cook bake fry boil grill roast simmer scorch ignite flame blaze smoke toas
 love:'kiss hug cuddle adore like marry date flirt cherish snuggle smooch embrace',
 think:'ponder wonder guess doubt consider reflect imagine contemplate muse question ask',
 shout:'yell scream shriek roar bark yelp holler cheer bellow screech rage curse',
+talk:'speak chat say tell yap gossip babble chatter mumble mutter whisper lecture preach explain argue discuss narrate announce converse blab natter gab jabber utter recite',
+rant:'rave vent complain whine gripe grumble nag bicker quarrel',
+point:'indicate gesture direct aim target show signal nudge poke prod',
+slap:'smack whip lash flog thwack',
+sway:'rock swing lean teeter totter oscillate waver sashay',
+drift:'meander coast cruise linger loiter dawdle lurk',
+shift:'slide skate shuffle scoot sidestep switch transfer relocate swap',
+tumble:'somersault flip cartwheel wipeout flop',
+throw:'toss lob pitch fling chuck catapult',
+crawl:'creep slither sneak inch slink squirm wriggle',
+push:'pull shove drag tug yank lift carry haul press squeeze',
+clap:'applaud slam',
+bow:'nod bend curtsy kneel stoop duck apologize beg pray worship',
+sparkle:'shine glow twinkle flash flicker glitter shimmer glimmer gleam blink wink beam radiate',
+pulse:'breathe throb inhale exhale thump',
+write:'type draw paint scribble sketch doodle sign text email code compose author',
+shoot:'fire zap snipe spit',
 buttsex:'sex fuck hump fornicate shag screw mate boink bone copulate procreate rut hookup',
 swim:'paddle splash row bathe wash soak float'};
 const AL={};for(const k in LEX)LEX[k].split(' ').forEach(w=>AL[w]=k);
 function find(v){
   v=v.toLowerCase().replace(/[^a-z]/g,'');if(!v)return null;
-  const c=new Set([v]),m=v.match(/^(.+?)(ing|ed|es|s|er)$/);
+  const c=new Set([v]),m=v.match(/^(.+?)(ings?|ed|es|s|ers?|ment)$/);
   if(m){const b=m[1];c.add(b);c.add(b+'e');c.add(b.replace(/(.)\1$/,'$1'))}
   for(const k of c){const n=AL[k]||k;if(V[n])return V[n]}
-  return null;
+  let best='',bn=null;
+  for(const w of Object.keys(AL).concat(Object.keys(V)))if(w.length>=4&&w.length>best.length&&(v.startsWith(w)||v.endsWith(w))){best=w;bn=AL[w]||w}
+  return bn&&V[bn]?V[bn]:null;
 }
 /* any other verb: a motion pair, tempo, emitter and direction are derived from the verb's spelling, so every verb gets its own act */
 let vh=0;
@@ -162,11 +200,14 @@ function setWord(){
 }
 function setVerb(){vt=vI.value.trim().toLowerCase();vf=find(vt);vh=hsh(vt);t=0;TS={};P=[]}
 wI.addEventListener('input',setWord);vI.addEventListener('input',setVerb);
+const spE=document.getElementById('sp'),amE=document.getElementById('am'),syE=document.getElementById('sy');
+spE.addEventListener('input',()=>{spd=+spE.value});amE.addEventListener('input',()=>{amt=+amE.value});
+syE.addEventListener('input',()=>{const x=syE.value.replace(/\s/g,'');symG=x?seg(x):null});
 setWord();setVerb();wI.focus();wI.select();
 
 let last=performance.now();
 function frame(now){
-  const dt=Math.min(.05,(now-last)/1000);last=now;t+=dt;
+  const dt=Math.min(.05,(now-last)/1000)*spd;last=now;t+=dt;
   const n=chars.length,f=vt?(vf||fallback):()=>({}),tr=[];
   for(let i=0;i<n;i++){
     const b=BP[i]||{x:W/2,y:gy},d=dd[i]||(dd[i]={x:0,y:0,r:0}),o=Object.assign({x:0,y:0,r:0,sx:1,sy:1},f(i,n,t));
