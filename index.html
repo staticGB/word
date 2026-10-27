@@ -111,57 +111,114 @@ burn:(i,n,t)=>{if(tk('b'+i,.12))em(i,'^',R(-15,15),R(-140,-60),{dy:-fs*.7,gr:-10
 love:(i,n,t)=>{if(tk('l'+i,.7))em(i,'♥',R(-20,20),R(-90,-50),{dy:-fs*.8,gr:-20,max:1.8,s:.5,c:'#f6a'});return{y:-Math.abs(Math.sin(t*3+i*.5))*fs*.12,r:Math.sin(t*2+i)*.1}},
 think:(i,n,t)=>{if(i==n-1&&tk('q',.8))em(i,pick('?.'),R(10,40),R(-80,-40),{dy:-fs*.9,gr:-10,max:2,s:.6});return{r:Math.sin(t*1.2)*.15,y:Math.sin(t*1.2+i)*3}},
 shout:(i,n,t)=>{const k=Math.max(0,Math.sin(t*5));if(k>.5&&tk('o'+i,.3))em(i,'!',R(-120,120),R(-160,-40),{dy:-fs*.6,gr:100,max:1,s:.55});return{sx:1+k*.3,sy:1+k*.35}},
-swim:(i,n,t)=>{if(tk('w'+i,.6))em(i,'o',R(-5,5),R(-70,-30),{dy:-fs*.8,gr:-40,max:1.5,s:.3,c:'#8cf'});return{x:Math.sin(t*2)*fs,y:Math.sin(t*4-i*.8)*fs*.25,r:Math.cos(t*4-i*.8)*.3}}
+swim:(i,n,t)=>{if(tk('w'+i,.6))em(i,'o',R(-5,5),R(-70,-30),{dy:-fs*.8,gr:-40,max:1.5,s:.3,c:'#8cf'});return{x:Math.sin(t*2)*fs,y:Math.sin(t*4-i*.8)*fs*.25,r:Math.cos(t*4-i*.8)*.3}},
+/* world-effect + text-gag verbs */
+rain:(i,n,t)=>{if(tk('rn'+i,.07))em(i,pick("'."),R(-8,8),R(-50,-15),{dy:-fs*1.15,gr:950,land:1,max:45,s:.3,c:'#9cf'});return{y:fs*.03}},
+snow:(i,n,t)=>{if(tk('sn'+i,.15))em(i,pick('*·❄'),R(-30,30),R(8,26),{dy:-fs*1.25,gr:14,max:45,s:.35,c:'#def'});return{y:Math.sin(t*1.2+i*.4)*2}},
+drip:(i,n,t)=>{if(tk('dp'+i,.55))em(i,'o',0,R(0,10),{dy:-fs*.08,gr:1100,land:1,max:45,s:.32,c:'#7bd'});return{sy:1+Math.sin(t*2+i)*.02}},
+storm:(i,n,t)=>{if(tk('tm'+i,.06))em(i,pick("'."),R(-10,10),R(-70,-25),{dy:-fs*1.1,gr:1000,land:1,max:35,s:.3,c:'#9cf'});
+  if(tk('lit',1.4))for(let m=0;m<3;m++)em(Math.floor(R(0,n)),'⚡',R(-40,40),R(-50,10),{dy:-fs*1.5,gr:0,max:.35,s:2.2,c:'#fff'});
+  return{x:Math.sin(t*60+i*2)*6,y:Math.cos(t*57+i)*4,r:Math.sin(t*50+i)*.06}},
+wind:(i,n,t)=>{if(tk('wd'+i,.1))em(i,pick('-·~'),R(-260,-120),R(-30,10),{dy:-fs*.3,gr:0,max:.9,s:.35,c:'#bcd'});
+  return{r:-.22+Math.sin(t*4-i*.5)*.06,x:Math.sin(t*3-i*.4)*6}},
+flood:(i,n,t)=>{if(tk('fl'+i,.3))em(i,'o',R(-8,8),R(-70,-30),{gr:-50,max:1.6,s:.3,c:'#8cf'});
+  return{y:Math.sin(t*1.6-i*.3)*fs*.18,r:Math.sin(t*1.4+i)*.05,sy:1.02}},
+quake:(i,n,t)=>{if(tk('qk',.12))em(Math.floor(R(0,n)),pick(".`'"),R(-120,120),R(20,120),{gr:600,land:1,max:30,s:.4,c:'#a98'});
+  return{x:Math.sin(t*70+i*4)*11,y:Math.cos(t*63+i*3)*7,r:Math.sin(t*58+i)*.12}},
+sink:(i,n,t)=>{const k=(t*.5)%1;if(tk('sk'+i,.4))em(i,'o',R(-6,6),R(-50,-20),{gr:-40,max:1.4,s:.28,c:'#8be'});
+  return{y:k*fs*.55,r:Math.sin(t*2+i)*.04,sy:1-.1*k}},
+zoom:(i,n,t)=>{const c=(t%2.4)/2.4,k=c<.85?Math.pow(c/.85,3):0,o=Lp[i]||{x:W/2,y:gy};return{x:(o.x-W/2)*k*1.5,y:(o.y-gy)*k*1.5,sx:1+k*7,sy:1+k*7}},
+stretch:(i,n,t)=>{const k=Math.sin((t%3)/3*Math.PI);return{x:(i-(n-1)/2)*fs*.35*k,sx:1+k*.25}},
+squish:(i,n,t)=>{const k=Math.pow(Math.sin((t%2.2)/2.2*Math.PI),.6);return{sy:1-.85*k,sx:1+.55*k,y:fs*.62*k}},
+puff:(i,n,t)=>{const k=Math.sin((t%2.6)/2.6*Math.PI);if(tk('pf'+i,.5))em(i,pick('·o'),R(-20,20),R(-60,-20),{dy:-fs*.6,gr:-30,max:1.2,s:.3,c:'#ccc'});
+  return{sx:1+k*.45,sy:1+k*.45,y:-k*fs*.15}},
+die:(i,n,t)=>{const k=Math.min(1,((t*.7+i*.12)%3)/1.2),e=k*k*(3-2*k);return{y:e*fs*1.5,r:e*1.45,sy:1-.05*e}},
+dig:(i,n,t)=>{const k=Math.min(1,((t*.8+i*.06)%2.6)/1.8);
+  if(k>.05&&k<.95&&tk('dg'+i,.12))em(i,pick(".`,'"),R(-90,90),R(-170,-70),{gr:700,land:1,max:30,s:.35,c:'#a87'});
+  return{y:Math.pow(k,1.6)*fs*2.2,r:Math.sin(t*14+i)*.1*k}},
+hide:(i,n,t)=>{const c=(t+i*.18)%2.4,k=c<1?Math.abs(Math.sin(c*Math.PI)):0;return{sx:.001+k,sy:.001+k,y:(1-k)*fs*.2}},
+hiccup:(i,n,t)=>{const c=(t*1.3+i*.37)%1.7,k=c<.12?Math.sin(c/.12*Math.PI):0;
+  if(i==0&&k>.5&&tk('hc',.2))em(i,pick('!·'),R(-30,30),R(-60,-20),{dy:-fs*.9,gr:200,max:.6,s:.4});
+  return{y:-k*fs*.32,sx:1+k*.1}},
+dream:(i,n,t)=>{if(i==0&&tk('dr',1.4))em(0,pick('zZ'),R(-10,40),R(-30,-10),{dy:-fs*.9,gr:-8,max:2.6,s:.55,c:'#9bd'});
+  return{y:-Math.abs(Math.sin(t*.9+i*.2))*fs*.1,x:Math.sin(t*.6+i*.3)*fs*.25,r:Math.sin(t*.7+i)*.06}},
+moonwalk:(i,n,t)=>{const k=Math.sin(t*4);return{x:-((t*70)%(fs*8))+fs*4,y:-Math.abs(k)*2,r:-.06,sx:1.05}},
+teleport:(i,n,t)=>{const sd=seeds[i]||{a:0,b:0},c=(t*.9+i*.1)%2.2,vis=c<1.1;
+  if(c<.1&&tk('tp'+i,1.5))em(i,'*',R(-30,30),R(-60,0),{gr:0,max:.4,s:.8,c:'#cef'});
+  return{x:vis?0:sd.a*fs*3,y:vis?0:sd.b*fs*1.6,sx:vis?1:.001,sy:vis?1:.001}},
+glitch:(i,n,t)=>{const h=Math.floor(t*9),r=(Math.imul(h^i,2654435761)>>>0),on=(r%7)<3;
+  if(on&&tk('gl'+i,.1))em(i,pick('#@%&'),R(-40,40),R(-50,0),{dy:-fs*.4,gr:0,max:.3,s:.4,c:'#0ff'});
+  return{x:on?((r>>>3)%2?1:-1)*fs*.18:0,y:on?((r>>>9)%10-5)*fs*.05:0,sx:on?1.15:1,sy:on?.85:1}}
 };
 const LEX={
-shit:'poop crap defecate dump excrete deuce',
+shit:'poop crap defecate dump excrete deuce turd',
 pee:'piss urinate wee tinkle squirt spray',
 jump:'hop leap bounce skip spring vault bound pounce bob hurdle pogo',
-dance:'boogie groove waltz tango salsa twerk shimmy jive swing party rave disco sway',
-run:'jog sprint dash race rush flee chase hurry gallop trot scurry bolt charge zoom speed scamper',
-walk:'stroll amble wander march hike stride roam saunter trudge pace tiptoe stagger plod',
-sleep:'nap snooze snore doze rest slumber hibernate dream faint yawn lounge relax idle',
-sneeze:'achoo cough wheeze sniff hiccup choke',
+dance:'boogie groove waltz tango salsa twerk shimmy jive swing party rave disco sway floss',
+run:'jog sprint dash race rush flee chase hurry gallop trot scurry bolt charge speed scamper dart zip',
+walk:'stroll amble wander march hike stride roam saunter trudge pace tiptoe stagger plod stomp tramp trek',
+sleep:'nap snooze snore doze rest slumber hibernate lounge relax idle',
+sneeze:'achoo cough wheeze sniff choke sniffle',
 vomit:'puke barf spew retch gag heave hurl throwup regurgitate upchuck',
-cry:'sob weep bawl wail whimper mourn grieve sulk drool sweat leak blubber moan sniffle',
+cry:'sob weep bawl wail whimper mourn grieve sulk blubber moan',
 laugh:'giggle chuckle cackle snicker guffaw chortle lol lmao joke tease mock smirk grin',
-eat:'nom munch chew gobble devour bite nibble swallow feast chomp gnaw lick slurp drink sip gulp dine snack',
+eat:'nom munch chew gobble devour bite nibble swallow feast chomp gnaw lick slurp drink sip gulp dine snack taste',
 fart:'toot burp belch gas stink poot flatulate honk',
-kick:'stomp punt boot trample dribble tap',
+kick:'punt boot trample dribble tap',
 punch:'hit fight box slap smack whack bash strike slug hammer jab swat clobber beat spank bonk',
 sing:'hum whistle chant croon yodel rap serenade howl tweet chirp',
 spin:'twirl whirl rotate revolve swirl twist turn pirouette roll wind loop circle orbit',
-explode:'blow burst boom blast detonate bang pop erupt shatter blowup combust smash destroy break crash wreck demolish',
-fly:'glide soar float hover levitate flap flutter swoop sail drift ascend rise launch',
-melt:'dissolve decay rot wither wilt sag sink shrink deflate evaporate liquefy drip ooze fade vanish disappear',
-shake:'tremble shiver vibrate quake shudder rattle jitter wiggle wobble quiver convulse twitch buzz tingle',
+explode:'blow burst boom blast detonate bang pop erupt shatter smash destroy break crash wreck demolish',
+fly:'glide soar float hover levitate flap flutter swoop sail ascend launch',
+melt:'dissolve decay rot wither wilt sag deflate evaporate liquefy fade vanish disappear',
+shake:'tremble shiver vibrate shudder rattle jitter wiggle wobble quiver convulse twitch buzz tingle',
 wave:'hi hello greet salute bye goodbye ripple undulate flow',
 fall:'drop tumble collapse trip slip topple plunge plummet dive descend land',
-grow:'expand inflate swell bloat puff enlarge balloon widen stretch bulge',
-freeze:'chill frost ice numb stiffen snow',
-burn:'cook bake fry boil grill roast simmer scorch ignite flame blaze smoke toast sizzle sear',
+grow:'expand swell bloat enlarge balloon widen bulge sprout bloom',
+freeze:'chill frost ice numb stiffen',
+burn:'cook bake fry boil grill roast simmer scorch ignite flame blaze toast sizzle sear smoke',
 love:'kiss hug cuddle adore like marry date flirt cherish snuggle smooch embrace',
 think:'ponder wonder guess doubt consider reflect imagine contemplate muse question ask',
-shout:'yell scream shriek roar bark yelp holler cheer bellow screech rage curse',
+shout:'yell scream shriek roar bark yelp holler cheer bellow screech rage curse swear',
 talk:'speak chat say tell yap gossip babble chatter mumble mutter whisper lecture preach explain argue discuss narrate announce converse blab natter gab jabber utter recite',
 rant:'rave vent complain whine gripe grumble nag bicker quarrel',
-point:'indicate gesture direct aim target show signal nudge poke prod',
-slap:'smack whip lash flog thwack',
+point:'indicate gesture direct aim target show signal nudge prod',
+slap:'whip lash flog thwack',
 sway:'rock swing lean teeter totter oscillate waver sashay',
 drift:'meander coast cruise linger loiter dawdle lurk',
-shift:'slide skate shuffle scoot sidestep switch transfer relocate swap',
+shift:'slide skate shuffle sidestep switch transfer relocate swap',
 tumble:'somersault flip cartwheel wipeout flop',
 throw:'toss lob pitch fling chuck catapult',
 crawl:'creep slither sneak inch slink squirm wriggle',
-push:'pull shove drag tug yank lift carry haul press squeeze',
+push:'pull shove drag tug yank lift carry haul press',
 clap:'applaud slam',
 bow:'nod bend curtsy kneel stoop duck apologize beg pray worship',
 sparkle:'shine glow twinkle flash flicker glitter shimmer glimmer gleam blink wink beam radiate',
 pulse:'breathe throb inhale exhale thump',
-write:'type draw paint scribble sketch doodle sign text email code compose author',
+write:'type draw paint scribble sketch doodle sign text email code compose author spell print',
 shoot:'fire zap snipe spit',
 buttsex:'sex fuck hump fornicate shag screw mate boink bone copulate procreate rut hookup',
-swim:'paddle splash row bathe wash soak float'};
+swim:'paddle splash row bathe wash soak',
+rain:'rain drizzle pour downpour sprinkle monsoon',
+snow:'snow blizzard sleet hail',
+drip:'drip dribble trickle seep',
+storm:'storm thunder lightning tempest hurricane cyclone tornado typhoon gale',
+wind:'wind blow breeze gust',
+flood:'flood drown submerge overflow surge',
+quake:'quake earthquake rumble tremor',
+sink:'sink',
+zoom:'accelerate zoom',
+stretch:'stretch spread widen',
+squish:'squish squash squeeze crush compress flatten',
+puff:'puff inflate',
+die:'die perish expire croak',
+dig:'dig excavate shovel burrow',
+hide:'hide conceal cower',
+hiccup:'hiccup',
+dream:'dream',
+moonwalk:'moonwalk',
+teleport:'teleport warp',
+glitch:'glitch malfunction buffer lag'};;
 const AL={};for(const k in LEX)LEX[k].split(' ').forEach(w=>AL[w]=k);
 function find(v){
   v=v.toLowerCase().replace(/[^a-z]/g,'');if(!v)return null;
